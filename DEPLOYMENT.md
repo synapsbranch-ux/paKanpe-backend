@@ -4,7 +4,7 @@
 
 | Environnement | Déclencheur | Usage |
 | --- | --- | --- |
-| Local | Docker Compose | Développement et démonstration |
+| Local | Docker | Développement |
 | Test | Pull request / branche `develop` | CI, migrations et tests |
 | Production | Fusion dans `main` | Images versionnées dans GHCR |
 
@@ -12,8 +12,8 @@
 
 1. Créer une base PostgreSQL distincte par environnement.
 2. Définir `DATABASE_URL`, un `JWT_SECRET` aléatoire d'au moins 32 caractères et les origines HTTPS.
-3. Exécuter `alembic upgrade head` avant de démarrer Uvicorn.
-4. Ne pas exécuter `app.seed` en production : cette commande contient des comptes de démonstration.
+3. Construire l'image depuis ce dossier puis fournir les variables à la plateforme ; aucune commande de démarrage surchargée n'est nécessaire.
+4. L'image exécute les migrations puis Uvicorn ; elle ne crée aucun compte de démonstration.
 5. Exposer `/health` au système de supervision.
 
 ## Frontend
@@ -35,4 +35,3 @@
 4. Deux guichets ne peuvent pas appeler le même ticket.
 5. L'écran public reflète un appel en moins de cinq secondes.
 6. Les journaux ne contiennent ni mot de passe ni JWT.
-

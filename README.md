@@ -6,11 +6,18 @@ API FastAPI autonome pour le MVP. Elle fournit l'authentification JWT, le contr�
 
 - Python 3.12+
 - PostgreSQL 15+
-- Docker et Docker Compose (option recommandée)
+- Docker
 
 ## Démarrage avec Docker
 
-    docker compose up --build
+    docker build -t pagenkanpe-api .
+    docker run --rm -p 8000:8000 \
+      -e DATABASE_URL='postgresql+psycopg://USER:PASSWORD@HOST:5432/DATABASE' \
+      -e JWT_SECRET='un-secret-aleatoire-d-au-moins-32-caracteres' \
+      -e FRONTEND_ORIGINS='https://votre-frontend.example' \
+      pagenkanpe-api
+
+La base PostgreSQL doit être disponible via `DATABASE_URL`. Au démarrage, le conteneur applique les migrations puis démarre l'API. Aucun jeu de données de démonstration n'est créé.
 
 L'API est disponible sur `http://localhost:8000`, Swagger sur `http://localhost:8000/docs` et la santé sur `http://localhost:8000/health`.
 
@@ -21,7 +28,6 @@ L'API est disponible sur `http://localhost:8000`, Swagger sur `http://localhost:
     pip install -e '.[dev]'
     cp .env.example .env
     alembic upgrade head
-    python -m app.seed
     uvicorn app.main:app --reload
 
 ## Tests
@@ -46,5 +52,6 @@ Par défaut, les tests utilisent SQLite pour rester rapides. Pour les tests d'in
 
 ## Déploiement
 
-Le workflow CI valide Ruff, les tests sur PostgreSQL, les migrations et la couverture. Le workflow CD construit ensuite une image OCI et la publie dans GitHub Container Registry. Si le secret `STAGING_DEPLOY_WEBHOOK_URL` est défini, il déclenche aussi le déploiement de l'environnement de test.
+En production, le conteneur applique uniquement les migrations avant de démarrer l'API. Il n'exécute aucun script de démonstration et ne crée donc aucun compte avec un mot de passe connu.
 
+Le workflow CI valide Ruff, les tests sur PostgreSQL, les migrations et la couverture. Le workflow CD construit ensuite une image OCI et la publie dans GitHub Container Registry. Si le secret `STAGING_DEPLOY_WEBHOOK_URL` est défini, il déclenche aussi le déploiement de l'environnement de test.
